@@ -1,52 +1,47 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-
-
 import sys
-from PyQt5.QtWidgets import (QWidget, QApplication, QListWidget, QStackedWidget, 
-                             QLabel, QHBoxLayout, QVBoxLayout)
+from PyQt5 import QtCore, QtGui, QtWidgets
+from toolsbox_ui import Ui_toolsbox
+import ipaddress
+import json
 
-
-
-class Example(QWidget):
+class MyFirstGuiProgram(Ui_toolsbox):
+    def __init__(self, dialog):
+        Ui_toolsbox.__init__(self)
+        self.setupUi(dialog)
+        self.ipconvert_str2num_run.clicked.connect(self.ipconvert_str2num_proc)
+        self.ipconvert_num2str_run.clicked.connect(self.ipconvert_num2str_proc)
+        self.jsonformat_run.clicked.connect(self.jsonformat_proc)
     
-    def __init__(self):
-        super().__init__()
+    def ipconvert_num2str_proc(self):
+        numip = self.ipconvert_num2str_input.text()
+        strip = ipaddress.ip_address(int(numip))
+        print(strip)
+        self.ipconvert_num2str_output.setText(str(strip))
         
-        self.initUI()
+    def ipconvert_str2num_proc(self):
+        strip = self.ipconvert_str2num_input.text()
+        numip = int(ipaddress.ip_address(strip))
+        self.ipconvert_str2num_output.setText(str(numip))
         
-        
-    def initUI(self):
-        
-        self.list = QListWidget(self)
-        self.list.insertItem(0, "IP格式转换")
-        self.list.insertItem(1, "JSON格式化")
-        self.list.setFixedWidth(100)
-        
-        self.ip_convert = QLabel("IP 转换处理逻辑")
-        self.json_format = QLabel("JSON 格式化处理逻辑")
-        
-        self.stack = QStackedWidget(self)
-        self.stack.insertWidget(0, self.ip_convert)
-        self.stack.insertWidget(1, self.json_format)
-        
-        self.list.currentRowChanged.connect(self.stack.setCurrentIndex)
-        
-        mainLayout = QHBoxLayout(self)
-        mainLayout.addWidget(self.list)
-        mainLayout.addWidget(self.stack)
-        mainLayout.addStretch()
-        self.setLayout(mainLayout)
+    def jsonformat_proc(self):
+        text = self.jsonformat_text.toPlainText()
+        json_obj = json.loads(text)
+        text = json.dumps(json_obj, indent=4)
+        self.jsonformat_text.setPlainText(text)
         
         
-        self.show()
         
-   
-            
+    
+    
         
+
 if __name__ == '__main__':
+    app = QtWidgets.QApplication(sys.argv)
+    dialog = QtWidgets.QDialog()
     
-    app = QApplication(sys.argv)
-    ex = Example()
+    prog = MyFirstGuiProgram(dialog)
+    dialog.show()
     sys.exit(app.exec_())
